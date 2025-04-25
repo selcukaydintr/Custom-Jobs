@@ -1,0 +1,1626 @@
+<!DOCTYPE html>
+
+<html lang="tr">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Robotik Tesisat Simülatörü - JSON Entegrasyonlu</title>
+
+    <style>
+
+        body {
+
+            font-family: Arial, sans-serif;
+
+            margin: 0;
+
+            padding: 0;
+
+            background-color: #f0f0f0;
+
+        }
+
+        
+
+        .container {
+
+            display: flex;
+
+            height: 100vh;
+
+        }
+
+        
+
+        .sidebar {
+
+            width: 220px;
+
+            background-color: #2c3e50;
+
+            color: white;
+
+            padding: 10px;
+
+            overflow-y: auto;
+
+            display: flex;
+
+            flex-direction: column;
+
+        }
+
+        
+
+        .component-list {
+
+            margin-top: 10px;
+
+            overflow-y: auto;
+
+            flex-grow: 1;
+
+        }
+
+        
+
+        .component-item {
+
+            padding: 8px;
+
+            margin-bottom: 5px;
+
+            background-color: #34495e;
+
+            border-radius: 4px;
+
+            cursor: grab;
+
+            user-select: none;
+
+            display: flex;
+
+            align-items: center;
+
+        }
+
+        
+
+        .component-item:hover {
+
+            background-color: #3498db;
+
+        }
+
+        
+
+        .component-icon {
+
+            width: 20px;
+
+            height: 20px;
+
+            margin-right: 8px;
+
+            display: inline-block;
+
+        }
+
+        
+
+        .canvas-container {
+
+            flex: 1;
+
+            position: relative;
+
+            overflow: hidden;
+
+        }
+
+        
+
+        #robot-canvas {
+
+            width: 100%;
+
+            height: 100%;
+
+            background-color: #fff;
+
+            background-image: 
+
+                linear-gradient(#eee 1px, transparent 1px),
+
+                linear-gradient(90deg, #eee 1px, transparent 1px);
+
+            background-size: 20px 20px;
+
+        }
+
+        
+
+        .port {
+
+            fill: #FFD700;
+
+            stroke: #333;
+
+            stroke-width: 1;
+
+            cursor: pointer;
+
+        }
+
+        
+
+        .port:hover {
+
+            fill: #FFA500;
+
+            r: 6;
+
+        }
+
+        
+
+        .active-port {
+
+            fill: #32CD32;
+
+            animation: pulse 1.5s infinite;
+
+        }
+
+        
+
+        @keyframes pulse {
+
+            0% { r: 3; fill: #32CD32; }
+
+            50% { r: 5; fill: #00FF00; }
+
+            100% { r: 3; fill: #32CD32; }
+
+        }
+
+        
+
+        .cable {
+
+            fill: none;
+
+            stroke-width: 2.5;
+
+            stroke-linecap: round;
+
+        }
+
+        
+
+        .draggable {
+
+            cursor: move;
+
+        }
+
+        
+
+        .toolbar {
+
+            position: absolute;
+
+            top: 10px;
+
+            right: 10px;
+
+            background-color: rgba(255, 255, 255, 0.9);
+
+            padding: 8px;
+
+            border-radius: 5px;
+
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+
+            display: flex;
+
+            flex-wrap: wrap;
+
+            gap: 5px;
+
+            max-width: 500px;
+
+        }
+
+        
+
+        button {
+
+            padding: 8px 12px;
+
+            background-color: #3498db;
+
+            color: white;
+
+            border: none;
+
+            border-radius: 3px;
+
+            cursor: pointer;
+
+            font-size: 12px;
+
+            transition: background-color 0.3s;
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 5px;
+
+        }
+
+        
+
+        button:hover {
+
+            background-color: #2980b9;
+
+        }
+
+        
+
+        .button-icon {
+
+            width: 14px;
+
+            height: 14px;
+
+        }
+
+        
+
+        .color-picker-container {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 5px;
+
+            margin-left: 5px;
+
+        }
+
+        
+
+        .color-picker {
+
+            width: 24px;
+
+            height: 24px;
+
+            padding: 0;
+
+            border: none;
+
+            border-radius: 3px;
+
+            cursor: pointer;
+
+        }
+
+        
+
+        #json-output {
+
+            position: absolute;
+
+            bottom: 10px;
+
+            right: 10px;
+
+            width: 300px;
+
+            height: 200px;
+
+            background-color: #f8f9fa;
+
+            border: 1px solid #dee2e6;
+
+            border-radius: 5px;
+
+            padding: 10px;
+
+            font-family: monospace;
+
+            font-size: 12px;
+
+            resize: both;
+
+            overflow: auto;
+
+            display: none;
+
+        }
+
+        
+
+        .status-bar {
+
+            position: absolute;
+
+            bottom: 0;
+
+            left: 0;
+
+            right: 0;
+
+            padding: 5px 10px;
+
+            background-color: #f8f9fa;
+
+            border-top: 1px solid #dee2e6;
+
+            display: flex;
+
+            justify-content: space-between;
+
+            font-size: 12px;
+
+        }
+
+        
+
+        /* Pin Configuration Dialog */
+
+        .dialog-overlay {
+
+            position: fixed;
+
+            top: 0;
+
+            left: 0;
+
+            right: 0;
+
+            bottom: 0;
+
+            background-color: rgba(0,0,0,0.5);
+
+            z-index: 1000;
+
+            display: none;
+
+            justify-content: center;
+
+            align-items: center;
+
+        }
+
+        
+
+        .dialog {
+
+            background-color: white;
+
+            padding: 20px;
+
+            border-radius: 5px;
+
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+
+            width: 400px;
+
+            max-width: 90%;
+
+            max-height: 80vh;
+
+            overflow-y: auto;
+
+        }
+
+        
+
+        .dialog h2 {
+
+            margin-top: 0;
+
+            color: #2c3e50;
+
+        }
+
+        
+
+        .dialog-form {
+
+            display: grid;
+
+            gap: 10px;
+
+        }
+
+        
+
+        .form-group {
+
+            display: grid;
+
+            grid-template-columns: 150px 1fr;
+
+            align-items: center;
+
+            gap: 10px;
+
+        }
+
+        
+
+        .dialog-form input, .dialog-form select {
+
+            padding: 8px;
+
+            border: 1px solid #ddd;
+
+            border-radius: 4px;
+
+        }
+
+        
+
+        .dialog-buttons {
+
+            margin-top: 20px;
+
+            display: flex;
+
+            justify-content: flex-end;
+
+            gap: 10px;
+
+        }
+
+        
+
+        /* Pin mapping panel */
+
+        .pin-mapping-panel {
+
+            position: absolute;
+
+            bottom: 10px;
+
+            left: 10px;
+
+            width: 300px;
+
+            background-color: rgba(255, 255, 255, 0.9);
+
+            border-radius: 5px;
+
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+
+            padding: 10px;
+
+            display: none;
+
+        }
+
+        
+
+        .pin-mapping-title {
+
+            font-weight: bold;
+
+            margin-bottom: 10px;
+
+            color: #2c3e50;
+
+        }
+
+        
+
+        .pin-mapping-list {
+
+            max-height: 200px;
+
+            overflow-y: auto;
+
+            font-size: 12px;
+
+        }
+
+        
+
+        .pin-mapping-item {
+
+            padding: 5px;
+
+            border-bottom: 1px solid #eee;
+
+            display: flex;
+
+            justify-content: space-between;
+
+        }
+
+        
+
+        .pin-mapping-item:last-child {
+
+            border-bottom: none;
+
+        }
+
+        
+
+        /* Tooltip styles */
+
+        .tooltip {
+
+            position: absolute;
+
+            background-color: rgba(0, 0, 0, 0.8);
+
+            color: white;
+
+            padding: 5px 10px;
+
+            border-radius: 3px;
+
+            font-size: 12px;
+
+            pointer-events: none;
+
+            z-index: 1000;
+
+            display: none;
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <div class="container">
+
+        <div class="sidebar">
+
+            <h2>Bileşenler</h2>
+
+            <div class="component-list">
+
+                <div class="component-item" data-type="arduino">
+
+                    <div class="component-icon">🔌</div>
+
+                    Arduino Uno
+
+                </div>
+
+                <div class="component-item" data-type="motor">
+
+                    <div class="component-icon">⚙️</div>
+
+                    DC Motor
+
+                </div>
+
+                <div class="component-item" data-type="servo">
+
+                    <div class="component-icon">⚙️</div>
+
+                    Servo Motor
+
+                </div>
+
+                <div class="component-item" data-type="stepper">
+
+                    <div class="component-icon">⚙️</div>
+
+                    Step Motor
+
+                </div>
+
+                <div class="component-item" data-type="led">
+
+                    <div class="component-icon">💡</div>
+
+                    LED
+
+                </div>
+
+                <div class="component-item" data-type="resistor">
+
+                    <div class="component-icon">🔳</div>
+
+                    Direnç
+
+                </div>
+
+                <div class="component-item" data-type="ultrasonic">
+
+                    <div class="component-icon">📡</div>
+
+                    Ultrasonik Sensör
+
+                </div>
+
+                <div class="component-item" data-type="ir">
+
+                    <div class="component-icon">👁️</div>
+
+                    IR Sensör
+
+                </div>
+
+                <div class="component-item" data-type="button">
+
+                    <div class="component-icon">🔘</div>
+
+                    Buton
+
+                </div>
+
+                <div class="component-item" data-type="relay">
+
+                    <div class="component-icon">⚡</div>
+
+                    Röle
+
+                </div>
+
+                <div class="component-item" data-type="battery">
+
+                    <div class="component-icon">🔋</div>
+
+                    Pil (9V)
+
+                </div>
+
+                <div class="component-item" data-type="breadboard">
+
+                    <div class="component-icon">📋</div>
+
+                    Breadboard
+
+                </div>
+
+                <div class="component-item" data-type="lm298n">
+
+                    <div class="component-icon">🔄</div>
+
+                    L298N Motor Sürücü
+
+                </div>
+
+            </div>
+
+            
+
+            <div style="margin-top: 10px; border-top: 1px solid #455a64; padding-top: 10px;">
+
+                <button id="show-pin-mappings" style="width: 100%; margin-bottom: 5px;">
+
+                    <div class="button-icon">📊</div> Pin Eşleştirmelerini Göster
+
+                </button>
+
+                <button id="toggle-json" style="width: 100%;">
+
+                    <div class="button-icon">📋</div> JSON Görünümü
+
+                </button>
+
+            </div>
+
+        </div>
+
+        
+
+        <div class="canvas-container">
+
+            <svg id="robot-canvas" viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+
+                <!-- Grid and components will be rendered here -->
+
+                <defs>
+
+                    <!-- Arduino Uno -->
+
+                    <symbol id="arduino" viewBox="0 0 120 80">
+
+                        <rect width="120" height="80" fill="#00979D" rx="5" stroke="#007076" stroke-width="1"/>
+
+                        <rect x="10" y="10" width="100" height="60" fill="#008184" rx="3"/>
+
+                        
+
+                        <!-- Digital pins -->
+
+                        <g transform="translate(10, 5)">
+
+                            <rect x="0" y="0" width="70" height="10" fill="#333"/>
+
+                            <text x="35" y="8" font-size="6" fill="white" text-anchor="middle">DIGITAL</text>
+
+                        </g>
+
+                        
+
+                        <!-- Analog pins -->
+
+                        <g transform="translate(85, 25)">
+
+                            <rect x="0" y="0" width="30" height="50" fill="#333"/>
+
+                            <text x="15" y="30" font-size="6" fill="white" text-anchor="middle" transform="rotate(-90, 15, 30)">ANALOG</text>
+
+                        </g>
+
+                        
+
+                        <!-- USB port -->
+
+                        <rect x="20" y="70" width="20" height="10" fill="#666"/>
+
+                        
+
+                        <!-- Power jack -->
+
+                        <circle cx="105" cy="75" r="5" fill="#333"/>
+
+                        
+
+                        <text x="60" y="45" font-size="10" fill="white" text-anchor="middle">Arduino</text>
+
+                        <text x="60" y="55" font-size="8" fill="white" text-anchor="middle">UNO</text>
+
+                    </symbol>
+
+                    
+
+                    <!-- DC Motor -->
+
+                    <symbol id="motor" viewBox="0 0 60 40">
+
+                        <circle cx="30" cy="20" r="18" fill="#777" stroke="#555" stroke-width="1"/>
+
+                        <circle cx="30" cy="20" r="15" fill="#999"/>
+
+                        <circle cx="30" cy="20" r="3" fill="#555"/>
+
+                        <rect x="0" y="15" width="12" height="10" fill="#333"/>
+
+                        <line x1="12" y1="18" x2="30" y2="18" stroke="#333" stroke-width="1"/>
+
+                        <line x1="12" y1="22" x2="30" y2="22" stroke="#333" stroke-width="1"/>
+
+                    </symbol>
+
+                    
+
+                    <!-- Servo Motor -->
+
+                    <symbol id="servo" viewBox="0 0 60 40">
+
+                        <rect x="0" y="10" width="40" height="20" fill="#4285F4" stroke="#2A56C6" stroke-width="1" rx="2"/>
+
+                        <rect x="40" y="15" width="15" height="10" fill="#333" stroke="#222" stroke-width="1"/>
+
+                        <circle cx="55" cy="20" r="5" fill="#666" stroke="#444" stroke-width="1"/>
+
+                        <line x1="55" y1="20" x2="55" y2="12" stroke="#333" stroke-width="2"/>
+
+                        <text x="20" y="23" font-size="8" fill="white" text-anchor="middle">SG90</text>
+
+                    </symbol>
+
+                    
+
+                    <!-- Stepper Motor -->
+
+                    <symbol id="stepper" viewBox="0 0 60 60">
+
+                        <rect x="5" y="10" width="50" height="40" fill="#4B0082" stroke="#3A0065" stroke-width="1" rx="3"/>
+
+                        <circle cx="30" cy="30" r="15" fill="#666" stroke="#444" stroke-width="1"/>
+
+                        <circle cx="30" cy="30" r="3" fill="#222"/>
+
+                        <rect x="0" y="20" width="5" height="20" fill="#333"/>
+
+                        <text x="30" y="55" font-size="6" fill="#ddd" text-anchor="middle">NEMA 17</text>
+
+                    </symbol>
+
+                    
+
+                    <!-- LED -->
+
+                    <symbol id="led" viewBox="0 0 30 40">
+
+                        <path d="M15,5 L25,20 L5,20 Z" fill="#ff0000" stroke="#cc0000" stroke-width="1"/>
+
+                        <circle cx="15" cy="15" r="5" fill="#ffcccc" opacity="0.7"/>
+
+                        <rect x="13" y="20" width="4" height="15" fill="#aaa" stroke="#888" stroke-width="0.5"/>
+
+                        <line x1="10" y1="28" x2="20" y2="28" stroke="#888" stroke-width="1"/>
+
+                    </symbol>
+
+                    
+
+                    <!-- Resistor -->
+
+                    <symbol id="resistor" viewBox="0 0 60 20">
+
+                        <line x1="0" y1="10" x2="10" y2="10" stroke="#333" stroke-width="2"/>
+
+                        <rect x="10" y="5" width="40" height="10" fill="#D2B48C" stroke="#8B4513" stroke-width="1" rx="2"/>
+
+                        <line x1="50" y1="10" x2="60" y2="10" stroke="#333" stroke-width="2"/>
+
+                        <rect x="15" y="7" width="5" height="6" fill="#8B4513"/>
+
+                        <rect x="25" y="7" width="5" height="6" fill="#8B4513"/>
+
+                        <rect x="35" y="7" width="5" height="6" fill="#8B4513"/>
+
+                    </symbol>
+
+                    
+
+                    <!-- Ultrasonic Sensor -->
+
+                    <symbol id="ultrasonic" viewBox="0 0 80 40">
+
+                        <rect x="0" y="5" width="80" height="30" fill="#1E88E5" stroke="#1565C0" stroke-width="1" rx="2"/>
+
+                        <circle cx="20" cy="20" r="8" fill="#333" stroke="#222" stroke-width="1"/>
+
+                        <circle cx="60" cy="20" r="8" fill="#333" stroke="#222" stroke-width="1"/>
+
+                        <text x="40" y="25" font-size="8" fill="white" text-anchor="middle">HC-SR04</text>
+
+                    </symbol>
+
+                    
+
+                    <!-- IR Sensor -->
+
+                    <symbol id="ir" viewBox="0 0 40 30">
+
+                        <rect x="0" y="5" width="40" height="20" fill="#795548" stroke="#5D4037" stroke-width="1" rx="2"/>
+
+                        <circle cx="10" cy="15" r="5" fill="#333"/>
+
+                        <circle cx="30" cy="15" r="5" fill="#333"/>
+
+                        <text x="20" y="25" font-size="6" fill="white" text-anchor="middle">IR</text>
+
+                    </symbol>
+
+                    
+
+                    <!-- Battery -->
+
+                    <symbol id="battery" viewBox="0 0 60 40">
+
+                        <rect x="5" y="10" width="50" height="20" fill="#333" stroke="#000" stroke-width="1" rx="2"/>
+
+                        <rect x="0" y="15" width="5" height="10" fill="#c33" stroke="#000" stroke-width="1"/>
+
+                        <rect x="55" y="15" width="5" height="10" fill="#333" stroke="#000" stroke-width="1"/>
+
+                        <text x="30" y="23" font-size="10" fill="white" text-anchor="middle">9V</text>
+
+                    </symbol>
+
+                    
+
+                    <!-- Button -->
+
+                    <symbol id="button" viewBox="0 0 40 40">
+
+                        <rect x="5" y="15" width="30" height="10" fill="#333" stroke="#000" stroke-width="1"/>
+
+                        <circle cx="20" cy="20" r="7" fill="#f33" stroke="#800" stroke-width="1"/>
+
+                        <line x1="0" y1="20" x2="5" y2="20" stroke="#333" stroke-width="2"/>
+
+                        <line x1="35" y1="20" x2="40" y2="20" stroke="#333" stroke-width="2"/>
+
+                    </symbol>
+
+                    
+
+                    <!-- Relay -->
+
+                    <symbol id="relay" viewBox="0 0 60 40">
+
+                        <rect x="0" y="0" width="60" height="40" fill="#009688" stroke="#00796B" stroke-width="1" rx="3"/>
+
+                        <rect x="40" y="10" width="15" height="20" fill="#B0BEC5" stroke="#78909C" stroke-width="1"/>
+
+                        <text x="20" y="25" font-size="8" fill="white" text-anchor="middle">RELAY</text>
+
+                    </symbol>
+
+                    
+
+                    <!-- Breadboard -->
+
+                    <symbol id="breadboard" viewBox="0 0 160 100">
+
+                        <rect width="160" height="100" fill="#fff" stroke="#ccc" stroke-width="1" rx="3"/>
+
+                        
+
+                        <!-- Power rails -->
+
+                        <rect x="5" y="5" width="150" height="10" fill="#f00"/>
+
+                        <rect x="5" y="85" width="150" height="10" fill="#00f"/>
+
+                        
+
+                        <!-- Connection points top -->
+
+                        <g>
+
+                            <rect x="5" y="20" width="150" height="25" fill="#eee" stroke="#ddd" stroke-width="0.5"/>
+
+                            <g id="top-holes"></g>
+
+                        </g>
+
+                        
+
+                        <!-- Connection points bottom -->
+
+                        <g>
+
+                            <rect x="5" y="55" width="150" height="25" fill="#eee" stroke="#ddd" stroke-width="0.5"/>
+
+                            <g id="bottom-holes"></g>
+
+                        </g>
+
+                        
+
+                        <!-- Center divider -->
+
+                        <rect x="5" y="45" width="150" height="10" fill="#ddd"/>
+
+                    </symbol>
+
+                    
+
+                    <!-- L298N Motor Driver -->
+
+                    <symbol id="lm298n" viewBox="0 0 100 80">
+
+                        <rect width="100" height="80" fill="#3F51B5" stroke="#303F9F" stroke-width="1" rx="5"/>
+
+                        
+
+                        <!-- Terminal blocks -->
+
+                        <rect x="5" y="10" width="20" height="60" fill="#333" stroke="#222" stroke-width="1"/>
+
+                        <rect x="75" y="10" width="20" height="60" fill="#333" stroke="#222" stroke-width="1"/>
+
+                        
+
+                        <!-- Heat sink -->
+
+                        <rect x="35" y="20" width="30" height="40" fill="#aaa" stroke="#888" stroke-width="1"/>
+
+                        <line x1="35" y1="25" x2="65" y2="25" stroke="#888" stroke-width="1"/>
+
+                        <line x1="35" y1="30" x2="65" y2="30" stroke="#888" stroke-width="1"/>
+
+                        <line x1="35" y1="35" x2="65" y2="35" stroke="#888" stroke-width="1"/>
+
+                        <line x1="35" y1="40" x2="65" y2="40" stroke="#888" stroke-width="1"/>
+
+                        <line x1="35" y1="45" x2="65" y2="45" stroke="#888" stroke-width="1"/>
+
+                        <line x1="35" y1="50" x2="65" y2="50" stroke="#888" stroke-width="1"/>
+
+                        <line x1="35" y1="55" x2="65" y2="55" stroke="#888" stroke-width="1"/>
+
+                        
+
+                        <text x="50" y="75" font-size="8" fill="white" text-anchor="middle">L298N</text>
+
+                    </symbol>
+
+                </defs>
+
+            </svg>
+
+            
+
+            <div class="toolbar">
+
+                <button id="clear-btn">
+
+                    <div class="button-icon">🗑️</div> Temizle
+
+                </button>
+
+                <button id="save-btn">
+
+                    <div class="button-icon">💾</div> Kaydet
+
+                </button>
+
+                <button id="load-btn">
+
+                    <div class="button-icon">📂</div> Yükle
+
+                </button>
+
+                <button id="export-png-btn">
+
+                    <div class="button-icon">📷</div> PNG'ye Dönüştür
+
+                </button>
+
+                <button id="validate-btn">
+
+                    <div class="button-icon">✓</div> Bağlantıları Doğrula
+
+                </button>
+
+                <div class="color-picker-container">
+
+                    <label for="cable-color">Kablo:</label>
+
+                    <input type="color" id="cable-color" class="color-picker" value="#ff0000">
+
+                </div>
+
+            </div>
+
+            
+
+            <textarea id="json-output" readonly></textarea>
+
+            
+
+            <div class="pin-mapping-panel" id="pin-mapping-panel">
+
+                <div class="pin-mapping-title">Pin Eşleştirmeleri</div>
+
+                <div class="pin-mapping-list" id="pin-mapping-list">
+
+                    <!-- Pin mappings will be displayed here -->
+
+                </div>
+
+            </div>
+
+            
+
+            <div class="status-bar">
+
+                <div id="status-info">Hazır</div>
+
+                <div id="position-info">X: 0, Y: 0</div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    
+
+    <!-- Pin Configuration Dialog -->
+
+    <div class="dialog-overlay" id="pin-config-dialog">
+
+        <div class="dialog">
+
+            <h2 id="dialog-title">Pin Yapılandırması</h2>
+
+            <div class="dialog-form" id="dialog-form">
+
+                <!-- Form fields will be dynamically added here -->
+
+            </div>
+
+            <div class="dialog-buttons">
+
+                <button id="dialog-cancel">İptal</button>
+
+                <button id="dialog-save">Kaydet</button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    
+
+    <!-- Tooltip element -->
+
+    <div class="tooltip" id="tooltip"></div>
+
+    
+
+    <script>
+
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // Main elements
+
+            const canvas = document.getElementById('robot-canvas');
+
+            const components = document.querySelectorAll('.component-item');
+
+            const cableColorPicker = document.getElementById('cable-color');
+
+            const clearBtn = document.getElementById('clear-btn');
+
+            const saveBtn = document.getElementById('save-btn');
+
+            const loadBtn = document.getElementById('load-btn');
+
+            const exportPngBtn = document.getElementById('export-png-btn');
+
+            const validateBtn = document.getElementById('validate-btn');
+
+            const jsonOutput = document.getElementById('json-output');
+
+            const toggleJsonBtn = document.getElementById('toggle-json');
+
+            const showPinMappingsBtn = document.getElementById('show-pin-mappings');
+
+            const pinMappingPanel = document.getElementById('pin-mapping-panel');
+
+            const pinMappingList = document.getElementById('pin-mapping-list');
+
+            const statusInfo = document.getElementById('status-info');
+
+            const positionInfo = document.getElementById('position-info');
+
+            const tooltip = document.getElementById('tooltip');
+
+            
+
+            // Dialog elements
+
+            const pinConfigDialog = document.getElementById('pin-config-dialog');
+
+            const dialogTitle = document.getElementById('dialog-title');
+
+            const dialogForm = document.getElementById('dialog-form');
+
+            const dialogCancel = document.getElementById('dialog-cancel');
+
+            const dialogSave = document.getElementById('dialog-save');
+
+            
+
+            // State variables
+
+            let selectedComponent = null;
+
+            let isDragging = false;
+
+            let offset = { x: 0, y: 0 };
+
+            let componentCounter = 0;
+
+            let currentCableColor = cableColorPicker.value;
+
+            let jsonVisible = false;
+
+            let pinMappingsVisible = false;
+
+            let currentDialogComponent = null;
+
+            
+
+            // Cable drawing state
+
+            let activeCable = null;
+
+            let startPort = null;
+
+            let startCoords = { x: 0, y: 0 };
+
+            
+
+            // Circuit state
+
+            let circuitData = {
+
+                components: [],
+
+                connections: [],
+
+                pinMappings: {}
+
+            };
+
+            
+
+            // Component configuration specifications
+
+            const componentConfigs = {
+
+                arduino: {
+
+                    label: "Arduino Uno",
+
+                    pins: {
+
+                        digital: {
+
+                            count: 14,
+
+                            type: "digital",
+
+                            pwmPins: [3, 5, 6, 9, 10, 11]
+
+                        },
+
+                        analog: {
+
+                            count: 6,
+
+                            type: "analog"
+
+                        }
+
+                    }
+
+                },
+
+                motor: {
+
+                    label: "DC Motor",
+
+                    config: [
+
+                        { name: "name", label: "Motor İsmi", type: "text", default: "Motor" },
+
+                        { name: "maxSpeed", label: "Maksimum Hız (RPM)", type: "number", default: "200" }
+
+                    ]
+
+                },
+
+                servo: {
+
+                    label: "Servo Motor",
+
+                    config: [
+
+                        { name: "name", label: "Servo İsmi", type: "text", default: "Servo" },
+
+                        { name: "minAngle", label: "Minimum Açı", type: "number", default: "0" },
+
+                        { name: "maxAngle", label: "Maksimum Açı", type: "number", default: "180" }
+
+                    ]
+
+                },
+
+                stepper: {
+
+                    label: "Step Motor",
+
+                    config: [
+
+                        { name: "name", label: "Stepper İsmi", type: "text", default: "Stepper" },
+
+                        { name: "stepsPerRev", label: "Tur Başına Adım", type: "number", default: "200" }
+
+                    ]
+
+                },
+
+                led: {
+
+                    label: "LED",
+
+                    config: [
+
+                        { name: "name", label: "LED İsmi", type: "text", default: "LED" },
+
+                        { name: "color", label: "Renk", type: "color", default: "#ff0000" }
+
+                    ]
+
+                },
+
+                ultrasonic: {
+
+                    label: "Ultrasonik Sensör",
+
+                    config: [
+
+                        { name: "name", label: "Sensör İsmi", type: "text", default: "Ultrasonik" },
+
+                        { name: "maxDistance", label: "Maksimum Mesafe (cm)", type: "number", default: "400" }
+
+                    ]
+
+                },
+
+                ir: {
+
+                    label: "IR Sensör",
+
+                    config: [
+
+                        { name: "name", label: "
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // ... (önceki değişken tanımlamaları)
+
+            // Yardımcı: SVG koordinatını al
+            function getSvgPoint(evt) {
+                const pt = canvas.createSVGPoint();
+                pt.x = evt.clientX;
+                pt.y = evt.clientY;
+                return pt.matrixTransform(canvas.getScreenCTM().inverse());
+            }
+
+            // Bileşeni oluştur ve canvas'a ekle
+            components.forEach(item => {
+                item.addEventListener('dragstart', e => {
+                    selectedComponent = item.getAttribute('data-type');
+                });
+            });
+            canvas.addEventListener('dragover', e => {
+                e.preventDefault();
+            });
+            canvas.addEventListener('drop', e => {
+                e.preventDefault();
+                if (!selectedComponent) return;
+                const pt = getSvgPoint(e);
+                const id = selectedComponent + '-' + (++componentCounter);
+                const use = document.createElementNS(svgNS, 'use');
+                use.setAttribute('href', '#' + selectedComponent);
+                use.setAttribute('x', pt.x);
+                use.setAttribute('y', pt.y);
+                use.classList.add('draggable');
+                use.dataset.type = selectedComponent;
+                use.dataset.id = id;
+                canvas.appendChild(use);
+
+                // State'e kaydet
+                circuitData.components.push({
+                    id, type: selectedComponent, x: pt.x, y: pt.y, config: {}
+                });
+
+                // Tıklama ile pin dialog aç
+                use.addEventListener('click', () => openPinDialog(use));
+                initDrag(use);
+                selectedComponent = null;
+            });
+
+            // Sürükle taşı
+            function initDrag(el) {
+                el.addEventListener('mousedown', e => {
+                    isDragging = true;
+                    currentDragEl = el;
+                    const pt = getSvgPoint(e);
+                    offset.x = pt.x - parseFloat(el.getAttribute('x'));
+                    offset.y = pt.y - parseFloat(el.getAttribute('y'));
+                });
+            }
+            document.addEventListener('mousemove', e => {
+                if (!isDragging || !currentDragEl) return;
+                const pt = getSvgPoint(e);
+                currentDragEl.setAttribute('x', pt.x - offset.x);
+                currentDragEl.setAttribute('y', pt.y - offset.y);
+                positionInfo.textContent = `X: ${Math.round(pt.x)}, Y: ${Math.round(pt.y)}`;
+            });
+            document.addEventListener('mouseup', () => {
+                if (isDragging && currentDragEl) {
+                    // State güncelle
+                    const comp = circuitData.components.find(c => c.id === currentDragEl.dataset.id);
+                    comp.x = parseFloat(currentDragEl.getAttribute('x'));
+                    comp.y = parseFloat(currentDragEl.getAttribute('y'));
+                }
+                isDragging = false;
+                currentDragEl = null;
+            });
+
+            // Kablo çizimi
+            canvas.addEventListener('mousedown', e => {
+                if (e.target.classList.contains('port')) {
+                    startPort = e.target;
+                    startCoords = getSvgPoint(e);
+                    activeCable = document.createElementNS(svgNS, 'path');
+                    activeCable.setAttribute('stroke', currentCableColor);
+                    activeCable.classList.add('cable');
+                    canvas.appendChild(activeCable);
+                }
+            });
+            canvas.addEventListener('mousemove', e => {
+                if (!activeCable) return;
+                const pt = getSvgPoint(e);
+                const d = `M${startCoords.x},${startCoords.y} L${pt.x},${pt.y}`;
+                activeCable.setAttribute('d', d);
+            });
+            canvas.addEventListener('mouseup', e => {
+                if (!activeCable) return;
+                if (e.target.classList.contains('port')) {
+                    const endPort = e.target;
+                    const endCoords = getSvgPoint(e);
+                    // Sabit çizim
+                    activeCable.setAttribute('d', `M${startCoords.x},${startCoords.y} L${endCoords.x},${endCoords.y}`);
+                    // State'e kaydet
+                    circuitData.connections.push({
+                        from: startPort.dataset.id,
+                        to: endPort.dataset.id,
+                        color: currentCableColor
+                    });
+                } else {
+                    canvas.removeChild(activeCable);
+                }
+                activeCable = null;
+                startPort = null;
+            });
+
+            // Renk değişimi
+            cableColorPicker.addEventListener('input', e => {
+                currentCableColor = e.target.value;
+            });
+
+            // JSON Görünüm
+            toggleJsonBtn.addEventListener('click', () => {
+                jsonVisible = !jsonVisible;
+                jsonOutput.style.display = jsonVisible ? 'block' : 'none';
+                if (jsonVisible) jsonOutput.value = JSON.stringify(circuitData, null, 2);
+            });
+
+            // Pin Eşleştirme Paneli
+            showPinMappingsBtn.addEventListener('click', () => {
+                pinMappingsVisible = !pinMappingsVisible;
+                pinMappingPanel.style.display = pinMappingsVisible ? 'block' : 'none';
+                if (pinMappingsVisible) refreshPinMappings();
+            });
+            function refreshPinMappings() {
+                pinMappingList.innerHTML = '';
+                Object.entries(circuitData.pinMappings).forEach(([compId, pins]) => {
+                    pins.forEach(p => {
+                        const div = document.createElement('div');
+                        div.classList.add('pin-mapping-item');
+                        div.innerHTML = `<span>${compId}</span><span>${p.pin} → ${p.mapping}</span>`;
+                        pinMappingList.appendChild(div);
+                    });
+                });
+            }
+
+            // Dialog: Pin yapılandırma
+            function openPinDialog(el) {
+                const type = el.dataset.type;
+                const cfg = componentConfigs[type];
+                currentDialogComponent = el.dataset.id;
+                dialogTitle.textContent = `${cfg.label} (${el.dataset.id}) Pin Yapılandırması`;
+                dialogForm.innerHTML = '';
+
+                // Dijital/Analog pin listesi için örnek:
+                if (cfg.pins) {
+                    ['digital','analog'].forEach(group => {
+                        if (cfg.pins[group]) {
+                            for (let i = 0; i < cfg.pins[group].count; i++) {
+                                const row = document.createElement('div');
+                                row.classList.add('form-group');
+                                row.innerHTML = `
+                                    <label>${group.toUpperCase()} ${i}</label>
+                                    <input name="${group}-${i}" type="text" placeholder="Mapping">
+                                `;
+                                dialogForm.appendChild(row);
+                            }
+                        }
+                    });
+                }
+                // Özel konfigürasyonlar
+                if (cfg.config) {
+                    cfg.config.forEach(field => {
+                        const row = document.createElement('div');
+                        row.classList.add('form-group');
+                        row.innerHTML = `
+                            <label>${field.label}</label>
+                            <input name="${field.name}" type="${field.type}" value="${field.default}">
+                        `;
+                        dialogForm.appendChild(row);
+                    });
+                }
+
+                pinConfigDialog.style.display = 'flex';
+            }
+
+            dialogCancel.addEventListener('click', () => {
+                pinConfigDialog.style.display = 'none';
+                currentDialogComponent = null;
+            });
+            dialogSave.addEventListener('click', () => {
+                const data = new FormData(dialogForm);
+                // Pin mapping kaydet
+                circuitData.pinMappings[currentDialogComponent] = [];
+                data.forEach((val, key) => {
+                    circuitData.pinMappings[currentDialogComponent].push({ pin: key, mapping: val });
+                });
+                pinConfigDialog.style.display = 'none';
+                currentDialogComponent = null;
+            });
+
+            // Temizle
+            clearBtn.addEventListener('click', () => {
+                if (confirm('Tüm devreyi temizlemek istediğinize emin misiniz?')) {
+                    circuitData = { components: [], connections: [], pinMappings: {} };
+                    [...canvas.querySelectorAll('.draggable, .cable')].forEach(n => n.remove());
+                }
+            });
+
+            // Kaydet / Yükle (localStorage)
+            saveBtn.addEventListener('click', () => {
+                localStorage.setItem('robotCircuit', JSON.stringify(circuitData));
+                statusInfo.textContent = 'Kaydedildi';
+            });
+            loadBtn.addEventListener('click', () => {
+                const data = JSON.parse(localStorage.getItem('robotCircuit') || '{}');
+                if (data.components) {
+                    // Basitçe sayfayı yenileyerek yükle
+                    Object.assign(circuitData, data);
+                    location.reload();
+                }
+            });
+
+            // PNG'ye Dönüştür
+            exportPngBtn.addEventListener('click', () => {
+                const serializer = new XMLSerializer();
+                const source = serializer.serializeToString(canvas);
+                const img = new Image();
+                img.src = 'data:image/svg+xml;base64,' + btoa(source);
+                img.onload = () => {
+                    const c = document.createElement('canvas');
+                    c.width = canvas.clientWidth;
+                    c.height = canvas.clientHeight;
+                    const ctx = c.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+                    const a = document.createElement('a');
+                    a.download = 'robot_circuit.png';
+                    a.href = c.toDataURL('image/png');
+                    a.click();
+                };
+            });
+
+            // Bağlantıları Doğrula
+            validateBtn.addEventListener('click', () => {
+                let ok = true;
+                circuitData.components.forEach(c => {
+                    const conns = circuitData.connections.filter(d => d.from.startsWith(c.id) || d.to.startsWith(c.id));
+                    if (conns.length === 0) {
+                        ok = false;
+                        console.warn(`${c.id} için bağlantı yok!`);
+                    }
+                });
+                statusInfo.textContent = ok ? 'Tüm bağlantılar geçerli.' : 'Bazı bağlantılar eksik!';
+            });
+
+            // SVG namespace
+            const svgNS = 'http://www.w3.org/2000/svg';
+        });
+    </script>
