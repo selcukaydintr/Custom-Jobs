@@ -1,0 +1,273 @@
+@echo off
+title ROS 2 Humble - ARM64 Ubuntu 22.04 Offline Kurulum (Geniş Paket Seti)
+echo ROS 2 Humble (ARM64/aarch64) Ubuntu 22.04 Offline Kurulum Paket Indirici
+echo =================================================================
+echo.
+echo Bu script Raspberry Pi 5 icin gerekli tum ROS 2 Humble paketlerini indirir
+echo Kurulum icin: Dosyalari Pi'ye aktarin, sonra "sudo dpkg -i *.deb && sudo apt-get install -f" calistirin
+echo.
+
+REM Indirme klasoru olustur
+mkdir ros2_humble_arm64
+cd ros2_humble_arm64
+
+echo Temel ROS 2 paketleri indiriliyor...
+echo -------------------------------------
+
+REM Temel ROS 2 paketleri
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-ros-core/ros-humble-ros-core_0.10.0-1_all.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-ros-base/ros-humble-ros-base_0.10.0-1_all.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-rclcpp/ros-humble-rclcpp_16.0.5-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-rclpy/ros-humble-rclpy_3.3.10-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-rosidl-typesupport-c/ros-humble-rosidl-typesupport-c_2.0.1-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-rosidl-typesupport-cpp/ros-humble-rosidl-typesupport-cpp_2.0.1-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-rosidl-generator-c/ros-humble-rosidl-generator-c_3.1.5-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-rosidl-generator-cpp/ros-humble-rosidl-generator-cpp_3.1.5-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-rosidl-generator-py/ros-humble-rosidl-generator-py_0.14.4-2_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-rosgraph-msgs/ros-humble-rosgraph-msgs_1.2.1-1_arm64.deb
+
+echo Mesaj paketleri indiriliyor...
+echo ------------------------------
+
+REM ROS 2 mesaj paketleri
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-std-msgs/ros-humble-std-msgs_4.2.3-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-std-srvs/ros-humble-std-srvs_4.2.3-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-geometry-msgs/ros-humble-geometry-msgs_4.2.3-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-sensor-msgs/ros-humble-sensor-msgs_4.2.3-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-action-msgs/ros-humble-action-msgs_1.2.1-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-common-interfaces/ros-humble-common-interfaces_4.2.3-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-builtin-interfaces/ros-humble-builtin-interfaces_1.2.1-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-nav-msgs/ros-humble-nav-msgs_4.2.3-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-diagnostic-msgs/ros-humble-diagnostic-msgs_4.2.3-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-visualization-msgs/ros-humble-visualization-msgs_4.2.3-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-stereo-msgs/ros-humble-stereo-msgs_4.2.3-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-trajectory-msgs/ros-humble-trajectory-msgs_4.2.3-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-shape-msgs/ros-humble-shape-msgs_4.2.3-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-tf2-msgs/ros-humble-tf2-msgs_0.25.4-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-map-msgs/ros-humble-map-msgs_2.1.0-4_arm64.deb
+
+echo TF2 paketleri indiriliyor...
+echo ---------------------------
+
+REM TF2 paketleri
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-tf2/ros-humble-tf2_0.25.4-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-tf2-ros/ros-humble-tf2-ros_0.25.4-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-tf2-py/ros-humble-tf2-py_0.25.4-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-tf2-eigen/ros-humble-tf2-eigen_0.25.4-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-tf2-geometry-msgs/ros-humble-tf2-geometry-msgs_0.25.4-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-tf2-sensor-msgs/ros-humble-tf2-sensor-msgs_0.25.4-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-tf2-tools/ros-humble-tf2-tools_0.25.4-1_arm64.deb
+
+echo RViz2 paketleri indiriliyor...
+echo -----------------------------
+
+REM RViz2 paketleri
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-rviz2/ros-humble-rviz2_11.2.8-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-rviz-common/ros-humble-rviz-common_11.2.8-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-rviz-default-plugins/ros-humble-rviz-default-plugins_11.2.8-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-rviz-rendering/ros-humble-rviz-rendering_11.2.8-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-rviz-visual-testing-framework/ros-humble-rviz-visual-testing-framework_11.2.8-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-rviz-ogre-vendor/ros-humble-rviz-ogre-vendor_11.2.8-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-rviz-assimp-vendor/ros-humble-rviz-assimp-vendor_11.2.8-1_arm64.deb
+
+echo Launch paketleri indiriliyor...
+echo ------------------------------
+
+REM Launch paketleri
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-launch/ros-humble-launch_1.0.4-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-launch-ros/ros-humble-launch-ros_0.19.5-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-launch-xml/ros-humble-launch-xml_1.0.4-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-launch-yaml/ros-humble-launch-yaml_1.0.4-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-launch-testing/ros-humble-launch-testing_1.0.4-1_arm64.deb
+
+echo Robot paketleri indiriliyor...
+echo -----------------------------
+
+REM Robot araçları ve paketleri
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-robot-state-publisher/ros-humble-robot-state-publisher_3.0.2-3_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-joint-state-publisher/ros-humble-joint-state-publisher_2.3.0-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-joint-state-publisher-gui/ros-humble-joint-state-publisher-gui_2.3.0-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-xacro/ros-humble-xacro_2.0.8-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-urdf/ros-humble-urdf_2.6.0-2_arm64.deb
+
+echo Nav2 paketleri indiriliyor...
+echo ----------------------------
+
+REM Nav2 paketleri
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-nav2-bringup/ros-humble-nav2-bringup_1.1.12-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-nav2-common/ros-humble-nav2-common_1.1.12-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-nav2-core/ros-humble-nav2-core_1.1.12-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-nav2-msgs/ros-humble-nav2-msgs_1.1.12-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-nav2-util/ros-humble-nav2-util_1.1.12-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-nav2-behaviors/ros-humble-nav2-behaviors_1.1.12-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-nav2-bt-navigator/ros-humble-nav2-bt-navigator_1.1.12-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-nav2-controller/ros-humble-nav2-controller_1.1.12-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-nav2-costmap-2d/ros-humble-nav2-costmap-2d_1.1.12-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-nav2-dwb-controller/ros-humble-nav2-dwb-controller_1.1.12-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-nav2-lifecycle-manager/ros-humble-nav2-lifecycle-manager_1.1.12-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-nav2-map-server/ros-humble-nav2-map-server_1.1.12-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-nav2-planner/ros-humble-nav2-planner_1.1.12-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-nav2-recoveries/ros-humble-nav2-recoveries_1.1.12-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-nav2-voxel-grid/ros-humble-nav2-voxel-grid_1.1.12-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-nav2-amcl/ros-humble-nav2-amcl_1.1.12-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-nav2-navfn-planner/ros-humble-nav2-navfn-planner_1.1.12-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-nav2-regulated-pure-pursuit-controller/ros-humble-nav2-regulated-pure-pursuit-controller_1.1.12-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-nav2-rotation-shim-controller/ros-humble-nav2-rotation-shim-controller_1.1.12-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-nav2-waypoint-follower/ros-humble-nav2-waypoint-follower_1.1.12-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-nav2-theta-star-planner/ros-humble-nav2-theta-star-planner_1.1.12-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-nav2-smac-planner/ros-humble-nav2-smac-planner_1.1.12-1_arm64.deb
+
+echo SLAM paketleri indiriliyor...
+echo ----------------------------
+
+REM SLAM paketleri
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-slam-toolbox/ros-humble-slam-toolbox_2.6.6-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-slam-toolbox-msgs/ros-humble-slam-toolbox-msgs_2.6.6-1_arm64.deb
+
+echo Lifecycle paketleri indiriliyor...
+echo --------------------------------
+
+REM Lifecycle paketleri
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-lifecycle/ros-humble-lifecycle_0.20.3-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-lifecycle-msgs/ros-humble-lifecycle-msgs_1.2.1-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-rclcpp-lifecycle/ros-humble-rclcpp-lifecycle_16.0.5-1_arm64.deb
+
+echo Ek bagimliliklari indiriliyor...
+echo -------------------------------
+
+REM Ek bağımlılıklar
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-ament-cmake/ros-humble-ament-cmake_1.3.5-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-ament-index-cpp/ros-humble-ament-index-cpp_1.4.0-2_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-ament-index-python/ros-humble-ament-index-python_1.4.0-2_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-rcl/ros-humble-rcl_5.3.4-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-rcl-interfaces/ros-humble-rcl-interfaces_1.2.1-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-rcl-yaml-param-parser/ros-humble-rcl-yaml-param-parser_5.3.4-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-rcpputils/ros-humble-rcpputils_2.6.2-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-rcutils/ros-humble-rcutils_5.1.3-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-rmw/ros-humble-rmw_6.1.1-2_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-rmw-implementation/ros-humble-rmw-implementation_2.8.2-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-rmw-fastrtps-cpp/ros-humble-rmw-fastrtps-cpp_6.2.4-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-rmw-fastrtps-shared-cpp/ros-humble-rmw-fastrtps-shared-cpp_6.2.4-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-rmw-dds-common/ros-humble-rmw-dds-common_1.6.0-2_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-rosidl-runtime-c/ros-humble-rosidl-runtime-c_3.1.5-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-rosidl-runtime-cpp/ros-humble-rosidl-runtime-cpp_3.1.5-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-message-filters/ros-humble-message-filters_4.3.3-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-pluginlib/ros-humble-pluginlib_5.1.0-4_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-class-loader/ros-humble-class-loader_2.2.0-3_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-libyaml-vendor/ros-humble-libyaml-vendor_1.2.2-2_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-behaviortree-cpp-v3/ros-humble-behaviortree-cpp-v3_3.8.6-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-angles/ros-humble-angles_1.15.0-3_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-image-transport/ros-humble-image-transport_3.1.7-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-cv-bridge/ros-humble-cv-bridge_3.2.1-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-pcl-conversions/ros-humble-pcl-conversions_2.4.0-4_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-interactive-markers/ros-humble-interactive-markers_2.3.2-2_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-rosbag2/ros-humble-rosbag2_0.15.8-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-rosbag2-cpp/ros-humble-rosbag2-cpp_0.15.8-1_arm64.deb
+curl -O http://ports.ubuntu.com/pool/universe/r/ros-humble-laser-geometry/ros-humble-laser-geometry_2.4.0-4_arm64.deb
+
+echo Kurulum talimatları dosyası oluşturuluyor...
+echo --------------------------------------------
+
+REM Kurulum talimatları dosyası oluştur
+echo # ROS 2 Humble - Raspberry Pi 5 (ARM64) Kurulum Talimatları > KURULUM_TALIMATLARI.txt
+echo ================================================================= >> KURULUM_TALIMATLARI.txt
+echo. >> KURULUM_TALIMATLARI.txt
+echo ## Önkoşullar >> KURULUM_TALIMATLARI.txt
+echo. >> KURULUM_TALIMATLARI.txt
+echo - Ubuntu 22.04 (Jammy) yüklü ARM64 tabanlı Raspberry Pi 5 >> KURULUM_TALIMATLARI.txt
+echo - Süper kullanıcı (sudo) hakları >> KURULUM_TALIMATLARI.txt
+echo. >> KURULUM_TALIMATLARI.txt
+echo ## Kurulum Adımları >> KURULUM_TALIMATLARI.txt
+echo. >> KURULUM_TALIMATLARI.txt
+echo 1. İndirilen .deb dosyalarını Raspberry Pi'ye aktarın >> KURULUM_TALIMATLARI.txt
+echo 2. Terminal açın ve dosyaların bulunduğu dizine gidin >> KURULUM_TALIMATLARI.txt
+echo 3. Aşağıdaki komutları çalıştırın: >> KURULUM_TALIMATLARI.txt
+echo. >> KURULUM_TALIMATLARI.txt
+echo    ```bash >> KURULUM_TALIMATLARI.txt
+echo    sudo dpkg -i *.deb >> KURULUM_TALIMATLARI.txt
+echo    sudo apt-get install -f -y >> KURULUM_TALIMATLARI.txt
+echo    ``` >> KURULUM_TALIMATLARI.txt
+echo. >> KURULUM_TALIMATLARI.txt
+echo ## Kurulumu Test Etme >> KURULUM_TALIMATLARI.txt
+echo. >> KURULUM_TALIMATLARI.txt
+echo 1. Yeni bir terminal açın ve şu komutları çalıştırın: >> KURULUM_TALIMATLARI.txt
+echo. >> KURULUM_TALIMATLARI.txt
+echo    ```bash >> KURULUM_TALIMATLARI.txt
+echo    source /opt/ros/humble/setup.bash >> KURULUM_TALIMATLARI.txt
+echo    ros2 --help >> KURULUM_TALIMATLARI.txt
+echo    ``` >> KURULUM_TALIMATLARI.txt
+echo. >> KURULUM_TALIMATLARI.txt
+echo 2. Nav2 test etmek için: >> KURULUM_TALIMATLARI.txt
+echo. >> KURULUM_TALIMATLARI.txt
+echo    ```bash >> KURULUM_TALIMATLARI.txt
+echo    source /opt/ros/humble/setup.bash >> KURULUM_TALIMATLARI.txt
+echo    ros2 run nav2_util lifecycle_bringup >> KURULUM_TALIMATLARI.txt
+echo    ``` >> KURULUM_TALIMATLARI.txt
+echo. >> KURULUM_TALIMATLARI.txt
+echo 3. RViz2 test etmek için: >> KURULUM_TALIMATLARI.txt
+echo. >> KURULUM_TALIMATLARI.txt
+echo    ```bash >> KURULUM_TALIMATLARI.txt
+echo    source /opt/ros/humble/setup.bash >> KURULUM_TALIMATLARI.txt
+echo    ros2 run rviz2 rviz2 >> KURULUM_TALIMATLARI.txt
+echo    ``` >> KURULUM_TALIMATLARI.txt
+echo. >> KURULUM_TALIMATLARI.txt
+echo ## Ortam Değişkenlerini Kalıcı Hale Getirme >> KURULUM_TALIMATLARI.txt
+echo. >> KURULUM_TALIMATLARI.txt
+echo ~/.bashrc dosyasına aşağıdaki satırı ekleyin: >> KURULUM_TALIMATLARI.txt
+echo. >> KURULUM_TALIMATLARI.txt
+echo ```bash >> KURULUM_TALIMATLARI.txt
+echo echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc >> KURULUM_TALIMATLARI.txt
+echo ``` >> KURULUM_TALIMATLARI.txt
+echo. >> KURULUM_TALIMATLARI.txt
+echo ## Olası Hatalar ve Çözümleri >> KURULUM_TALIMATLARI.txt
+echo. >> KURULUM_TALIMATLARI.txt
+echo 1. **Eksik bağımlılıklar**: `sudo apt-get install -f -y` komutu eksik bağımlılıkları çözecektir. >> KURULUM_TALIMATLARI.txt
+echo 2. **İzin sorunları**: `chmod +x` komutuyla çalıştırılabilir dosyalara gerekli izinleri verebilirsiniz. >> KURULUM_TALIMATLARI.txt
+echo 3. **Paket bulunamadı hataları**: İndirilen tüm .deb dosyalarının aynı dizinde olduğundan emin olun. >> KURULUM_TALIMATLARI.txt
+
+echo Özet rapor oluşturuluyor...
+echo ------------------------
+
+REM Özet rapor
+echo ## ROS 2 Humble ARM64 (aarch64) Offline Kurulum Paketi > README.txt
+echo ================================================= >> README.txt
+echo. >> README.txt
+echo Bu paket Ubuntu 22.04 (Jammy) üzerinde çalışan Raspberry Pi 5 için ROS 2 Humble'ın offline kurulumunu içerir. >> README.txt
+echo. >> README.txt
+echo ### Paket içeriği: >> README.txt
+echo. >> README.txt
+echo - ROS 2 çekirdek bileşenleri (rclcpp, rclpy) >> README.txt
+echo - TF2 paketleri (tf2, tf2-ros) >> README.txt
+echo - RViz2 görselleştirme araçları >> README.txt
+echo - Nav2 navigasyon sistemi >> README.txt
+echo - SLAM Toolbox >> README.txt
+echo - Map Server >> README.txt
+echo - Lifecycle yönetimi paketleri >> README.txt
+echo - Launch sistemi >> README.txt
+echo - Robot State Publisher ve ilgili paketler >> README.txt
+echo. >> README.txt
+echo ### Kurulum için: >> README.txt
+echo. >> README.txt
+echo 1. İndirilen tüm dosyaları Raspberry Pi 5'e aktarın >> README.txt
+echo 2. Terminal açıp dosyaların bulunduğu dizine gidin >> README.txt
+echo 3. Aşağıdaki komutları çalıştırın: >> README.txt
+echo    sudo dpkg -i *.deb >> README.txt
+echo    sudo apt-get install -f -y >> README.txt
+echo. >> README.txt
+echo Detaylı kurulum talimatları için KURULUM_TALIMATLARI.txt dosyasına bakınız. >> README.txt
+echo. >> README.txt
+echo ### Not: >> README.txt
+echo. >> README.txt
+echo Bu paket, ROS 2 Humble'ın "Geniş Kurulum" versiyonudur ve navigasyon, haritalama ve >> README.txt
+echo temel robotik işlemleri için gerekli paketleri içerir. >> README.txt
+
+echo Tamamlandı! Tüm dosyalar "ros2_humble_arm64" klasörüne indirildi.
+echo --------------------------------------------------------------
+echo.
+echo Kurulum için:
+echo 1. İndirilen dosyaları Raspberry Pi 5'e aktarın
+echo 2. "sudo dpkg -i *.deb && sudo apt-get install -f -y" komutlarını çalıştırın
+echo.
+echo Talimatlar için README.txt ve KURULUM_TALIMATLARI.txt dosyalarına bakabilirsiniz.
+echo.
+pause
