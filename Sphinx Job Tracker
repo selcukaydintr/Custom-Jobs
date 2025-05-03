@@ -1,0 +1,814 @@
+Sphinx dokümantasyon sistemi için daha kapsamlı ve özelleştirilmiş bir kurulum ve yapılandırma talimatı oluşturacağım. Bu GitHub Copilot ile çalışacak şekilde tasarlanmış ve VS Code entegrasyonu da içeriyor.
+
+# Gelişmiş Sphinx Dokümantasyon Sistemi Kurulumu
+# ============================================
+
+# 1. Gerekli Kurulumlar
+# ---------------------
+
+# Python ortamı oluştur
+python3 -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+
+# requirements.txt dosyasını oluştur
+cat > requirements.txt << EOF
+sphinx==7.2.6
+sphinx-autobuild==2021.3.14
+sphinx-rtd-theme==1.3.0
+myst-parser==2.0.0
+sphinx-copybutton==0.5.2
+sphinx-prompt==1.5.0
+sphinx-tabs==3.4.1
+sphinx-togglebutton==0.3.2
+sphinx-autodoc-typehints==1.25.2
+nbsphinx==0.9.3
+jupyter==1.0.0
+pytest==7.4.3
+pylint==3.0.2
+black==23.11.0
+pre-commit==3.5.0
+EOF
+
+# Gereksinimleri kur
+pip install -r requirements.txt
+
+# 2. Sphinx Başlatma
+# -----------------
+sphinx-quickstart docs --sep --dot=_ --language=tr --suffix=.rst --master=index --makefile --batchfile
+
+# 3. Sphinx Yapılandırması
+# -----------------------
+# conf.py dosyasını güncelle
+cat > docs/source/conf.py << EOF
+import os
+import sys
+sys.path.insert(0, os.path.abspath('../../'))
+
+project = 'SeninProjen'
+copyright = '2025, SeninAdın'
+author = 'SeninAdın'
+release = '0.1.0'
+
+# Eklentiler
+extensions = [
+    'sphinx.ext.autodoc',
+    'sphinx.ext.napoleon',
+    'sphinx.ext.viewcode',
+    'sphinx.ext.todo',
+    'sphinx.ext.coverage',
+    'sphinx.ext.mathjax',
+    'sphinx.ext.ifconfig',
+    'sphinx.ext.githubpages',
+    'sphinx.ext.intersphinx',
+    'sphinx_autodoc_typehints',
+    'myst_parser',
+    'sphinx_copybutton',
+    'sphinx_prompt',
+    'sphinx_tabs.tabs',
+    'sphinx_togglebutton',
+    'nbsphinx',
+]
+
+# Yollar ve dışlanan desenler
+templates_path = ['_templates']
+exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', '**.ipynb_checkpoints', 'venv']
+
+# HTML tema ve statik dosyalar
+html_theme = 'sphinx_rtd_theme'
+html_static_path = ['_static']
+html_css_files = ['custom.css']
+
+# Tema seçenekleri
+html_theme_options = {
+    'navigation_depth': 4,
+    'collapse_navigation': False,
+    'sticky_navigation': True,
+    'includehidden': True,
+    'titles_only': False,
+    'logo_only': False,
+    'display_version': True,
+    'prev_next_buttons_location': 'both',
+    'style_external_links': True,
+}
+
+# Yapı seçenekleri
+todo_include_todos = True
+autodoc_member_order = 'bysource'
+autodoc_typehints = 'description'
+autodoc_default_options = {
+    'members': True,
+    'member-order': 'bysource',
+    'special-members': '__init__',
+    'undoc-members': True,
+    'exclude-members': '__weakref__',
+    'show-inheritance': True,
+}
+
+# Markdown desteği
+myst_enable_extensions = [
+    'amsmath',
+    'colon_fence',
+    'deflist',
+    'dollarmath',
+    'html_admonition',
+    'html_image',
+    'linkify',
+    'replacements',
+    'smartquotes',
+    'substitution',
+    'tasklist',
+]
+
+# İntersphinx bağlantıları
+intersphinx_mapping = {
+    'python': ('https://docs.python.org/3', None),
+    'numpy': ('https://numpy.org/doc/stable/', None),
+    'scipy': ('https://docs.scipy.org/doc/scipy/', None),
+    'matplotlib': ('https://matplotlib.org/stable/', None),
+    'pandas': ('https://pandas.pydata.org/pandas-docs/stable/', None),
+}
+
+# Otomatik Python API belgeleme
+nitpicky = True
+nitpick_ignore = [
+    ('py:class', 'optional'),
+    ('py:class', 'T'),
+]
+
+# Dil ayarları
+language = 'tr'
+locale_dirs = ['locale/']
+gettext_compact = False
+EOF
+
+# Özel CSS oluştur
+mkdir -p docs/source/_static
+cat > docs/source/_static/custom.css << EOF
+/* Özel CSS stilleri */
+.highlight {
+    background: #f8f8f8;
+    border-radius: 4px;
+}
+
+.rst-content code {
+    background: #f0f0f0;
+    padding: 2px 5px;
+    border-radius: 3px;
+}
+
+.rst-content .section ul li {
+    margin-bottom: 12px;
+}
+
+/* Dev Mode notları için */
+.dev-note {
+    background: #fffbe6;
+    border-left: 4px solid #ffd54f;
+    padding: 12px;
+    margin: 20px 0;
+}
+
+/* API referansları için */
+.class > dt, .function > dt {
+    padding: 8px;
+    background: #e7f2fa;
+    border-left: 3px solid #2980b9;
+}
+EOF
+
+# 4. Ana index.rst dosyasını güncelle
+cat > docs/source/index.rst << EOF
+Hoşgeldiniz: SeninProjen Dokümantasyonu
+=======================================
+
+.. toctree::
+   :maxdepth: 2
+   :caption: İçerik:
+
+   installation
+   usage
+   api/index
+   development/index
+   examples/index
+   faq
+   changelog
+
+Proje Hakkında
+-------------
+
+Bu projenin amacı ve temel özellikleri hakkında kısa bir açıklama.
+
+Özellikler
+---------
+
+* Özellik 1
+* Özellik 2
+* Özellik 3
+
+Dizinler ve Tablolar
+------------------
+
+* :ref:\`genindex\`
+* :ref:\`modindex\`
+* :ref:\`search\`
+EOF
+
+# 5. Klasör yapısını oluştur
+mkdir -p docs/source/api
+mkdir -p docs/source/development
+mkdir -p docs/source/examples
+mkdir -p docs/source/_templates
+mkdir -p docs/source/images
+
+# 6. Geliştirici dokümantasyonu
+cat > docs/source/development/index.rst << EOF
+Geliştiriciler için
+==================
+
+.. toctree::
+   :maxdepth: 2
+
+   installation
+   architecture
+   contribution
+   testing
+   dev_notes
+   api_guidelines
+EOF
+
+# Geliştirici notları oluştur
+cat > docs/source/development/dev_notes.md << EOF
+# Geliştirici Notları
+
+## Debug Modları
+
+```python
+# Debug modunu etkinleştir
+import os
+os.environ["DEBUG"] = "true"
+
+# Detaylı günlük kaydı
+import logging
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+```
+
+## Ortam Değişkenleri
+
+| Değişken | Açıklama | Varsayılan |
+|----------|----------|------------|
+| \`DEBUG\` | Debug modu | \`false\` |
+| \`LOG_LEVEL\` | Günlük seviyesi | \`INFO\` |
+| \`API_TIMEOUT\` | API zaman aşımı (sn) | \`30\` |
+
+## Geliştirme İş Akışı
+
+1. Feature branch oluştur: \`git checkout -b feature/yeni-ozellik\`
+2. Değişikliklerini commit et: \`git commit -am 'Yeni özellik: X'\`
+3. PR oluştur
+
+## İç Yapı
+
+- \`core/\`: Ana modül kodları
+- \`utils/\`: Yardımcı fonksiyonlar ve araçlar
+- \`tests/\`: Test paketleri
+- \`docs/\`: Dokümantasyon
+
+## GitHub Copilot İpuçları
+
+Copilot'u proje içinde daha verimli kullanmak için:
+
+- Fonksiyon başlangıçlarında detaylı docstring yazın
+- TypeHint kullanın
+- Karmaşık algoritmalar için açıklayıcı yorumlar ekleyin
+EOF
+
+# Diğer geliştirici dokümanları
+cat > docs/source/development/architecture.md << EOF
+# Mimari Tasarım
+
+## Genel Bakış
+
+```
++----------------+      +----------------+      +----------------+
+|                |      |                |      |                |
+|  Arayüz Katmanı| ---> |   İş Katmanı   | ---> | Veritabanı     |
+|                |      |                |      | Katmanı        |
++----------------+      +----------------+      +----------------+
+```
+
+## Bileşenler
+
+### Arayüz Katmanı
+- REST API endpoints
+- CLI arayüzü
+- Web arayüzü (gelecek sürümde)
+
+### İş Katmanı
+- Çekirdek iş mantığı
+- Servis sınıfları
+- Doğrulama ve iş kuralları
+
+### Veritabanı Katmanı
+- ORM modelleri
+- Repository sınıfları
+- Veri erişim katmanı
+
+## Veri Akışı
+1. İstek arayüz katmanından alınır
+2. İş katmanında işlenir
+3. Gerekirse veritabanı katmanı ile etkileşime girilir
+4. Yanıt arayüz katmanına döndürülür
+EOF
+
+# 7. API dokümantasyonu
+cat > docs/source/api/index.rst << EOF
+API Dokümantasyonu
+=================
+
+.. toctree::
+   :maxdepth: 2
+
+   overview
+   authentication
+   endpoints
+   models
+   exceptions
+   examples
+
+.. warning::
+   API'nin beta sürümüdür ve değişikliğe tabidir.
+EOF
+
+# 8. Kurulum ve Kullanım kılavuzları
+cat > docs/source/installation.md << EOF
+# Kurulum
+
+## Gereksinimler
+
+- Python 3.8+
+- pip
+
+## Hızlı Kurulum
+
+```bash
+# Sanal ortam oluştur
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+
+# Paketi kur
+pip install seniprojen
+
+# Veya geliştirme modu
+pip install -e .
+```
+
+## Docker ile Kurulum
+
+```bash
+docker build -t seniprojen .
+docker run -p 8000:8000 seniprojen
+```
+
+## Konfigürasyon
+
+Kurulumdan sonra yapılandırma dosyasını oluşturun:
+
+```bash
+seniprojen --init-config
+```
+
+Bu, varsayılan yapılandırma dosyasını `~/.seniprojen/config.yml` konumunda oluşturacaktır.
+EOF
+
+cat > docs/source/usage.md << EOF
+# Kullanım Kılavuzu
+
+## Temel Kullanım
+
+```python
+from seniprojen import Client
+
+# İstemci oluştur
+client = Client(api_key="your_api_key")
+
+# API'yi kullan
+result = client.process_data({"input": "test"})
+print(result)
+```
+
+## Komut Satırı Arayüzü
+
+Paketi komut satırından da kullanabilirsiniz:
+
+```bash
+seniprojen --help
+seniprojen process --input "test"
+```
+
+## İleri Düzey Seçenekler
+
+Gelişmiş yapılandırma seçenekleri:
+
+```python
+client = Client(
+    api_key="your_api_key",
+    timeout=60,
+    retry_attempts=3,
+    verbose=True
+)
+```
+EOF
+
+# 9. Örnekler oluştur
+cat > docs/source/examples/index.rst << EOF
+Örnekler
+========
+
+.. toctree::
+   :maxdepth: 2
+
+   basic
+   advanced
+   integration
+EOF
+
+cat > docs/source/examples/basic.md << EOF
+# Temel Örnekler
+
+## Basit Kullanım
+
+```python
+from seniprojen import Client
+
+client = Client()
+result = client.hello_world()
+print(result)  # "Hello, World!"
+```
+
+## Parametre Kullanımı
+
+```python
+from seniprojen import Client
+
+client = Client()
+result = client.greet("Ahmet")
+print(result)  # "Merhaba, Ahmet!"
+```
+EOF
+
+# 10. VS Code entegrasyonu
+mkdir -p .vscode
+cat > .vscode/settings.json << EOF
+{
+  "python.defaultInterpreterPath": "venv/bin/python",
+  "python.linting.enabled": true,
+  "python.linting.pylintEnabled": true,
+  "python.linting.flake8Enabled": false,
+  "python.formatting.provider": "black",
+  "python.formatting.blackPath": "venv/bin/black",
+  "python.formatting.blackArgs": ["--line-length", "88"],
+  "python.testing.pytestEnabled": true,
+  "python.testing.unittestEnabled": false,
+  "python.testing.nosetestsEnabled": false,
+  "python.testing.pytestArgs": [
+    "tests"
+  ],
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": true
+  },
+  "python.envFile": "${workspaceFolder}/.env",
+  "files.exclude": {
+    "**/__pycache__": true,
+    "**/.pytest_cache": true,
+    "**/*.egg-info": true,
+    "**/dist": true,
+    "**/build": true
+  },
+  "[python]": {
+    "editor.rulers": [88]
+  },
+  "restructuredtext.confPath": "${workspaceFolder}/docs/source",
+  "python.analysis.extraPaths": ["${workspaceFolder}"]
+}
+EOF
+
+# 11. GitHub Copilot yapılandırması
+cat > .github/copilot-config.json << EOF
+{
+  "patterns": {
+    "docstring": {
+      "prefix": "\"\"\"",
+      "body": [
+        "\"\"\"${1:Fonksiyon açıklaması}",
+        "",
+        "Args:",
+        "    ${2:param1} (${3:type}): ${4:Parametre açıklaması}",
+        "",
+        "Returns:",
+        "    ${5:type}: ${6:Dönüş değeri açıklaması}",
+        "",
+        "Raises:",
+        "    ${7:Exception}: ${8:Hata durumu açıklaması}",
+        "\"\"\""
+      ]
+    },
+    "todo": {
+      "prefix": "# TODO:",
+      "body": "# TODO: ${1:yapılacak iş açıklaması}"
+    }
+  },
+  "copilot.enable": {
+    "*": true,
+    "yaml": false,
+    "plaintext": false,
+    "markdown": true
+  },
+  "copilot.inlineSuggest.enable": true
+}
+EOF
+
+# 12. Pre-commit yapılandırması
+cat > .pre-commit-config.yaml << EOF
+repos:
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+    -   id: trailing-whitespace
+    -   id: end-of-file-fixer
+    -   id: check-yaml
+    -   id: check-added-large-files
+
+-   repo: https://github.com/psf/black
+    rev: 23.11.0
+    hooks:
+    -   id: black
+
+-   repo: https://github.com/pycqa/isort
+    rev: 5.12.0
+    hooks:
+    -   id: isort
+
+-   repo: https://github.com/pycqa/flake8
+    rev: 6.1.0
+    hooks:
+    -   id: flake8
+        additional_dependencies: [flake8-docstrings]
+EOF
+
+# 13. Otomatik API belgelendirme
+# Örnek bir modül oluştur
+mkdir -p seninprojen/core
+mkdir -p seninprojen/utils
+mkdir -p tests
+
+cat > seninprojen/__init__.py << EOF
+"""SeninProjen ana modülü."""
+
+from .core.client import Client
+
+__version__ = "0.1.0"
+__all__ = ["Client"]
+EOF
+
+cat > seninprojen/core/client.py << EOF
+"""İstemci sınıfı modülü."""
+
+from typing import Dict, Any, Optional
+
+
+class Client:
+    """API istemci sınıfı.
+    
+    Bu sınıf API ile iletişim kurmak için temel istemci işlevselliğini sağlar.
+    
+    Attributes:
+        api_key (str): API anahtarı
+        timeout (int): İstek zaman aşımı saniyesi
+        retry_attempts (int): Yeniden deneme sayısı
+        verbose (bool): Ayrıntılı günlük kaydı
+    """
+    
+    def __init__(
+        self,
+        api_key: Optional[str] = None,
+        timeout: int = 30,
+        retry_attempts: int = 3,
+        verbose: bool = False
+    ) -> None:
+        """İstemci nesnesini başlat.
+        
+        Args:
+            api_key: API anahtarı. None ise çevre değişkenlerinden alınır.
+            timeout: İstek zaman aşımı saniyesi
+            retry_attempts: Başarısız istekler için yeniden deneme sayısı
+            verbose: Ayrıntılı günlük kaydı etkinleştirilsin mi
+        """
+        self.api_key = api_key
+        self.timeout = timeout
+        self.retry_attempts = retry_attempts
+        self.verbose = verbose
+        
+    def process_data(self, data: Dict[str, Any]) -> Dict[str, Any]:
+        """Veriyi işle ve sonucu döndür.
+        
+        Args:
+            data: İşlenecek veri
+            
+        Returns:
+            İşlenmiş veri sonucu
+            
+        Raises:
+            ValueError: Geçersiz veri biçimi
+        """
+        if not isinstance(data, dict):
+            raise ValueError("Data must be a dictionary")
+            
+        # Veri işleme simülasyonu
+        return {"result": f"Processed: {data}"}
+        
+    def hello_world(self) -> str:
+        """Basit bir test fonksiyonu.
+        
+        Returns:
+            Karşılama mesajı
+        """
+        return "Hello, World!"
+        
+    def greet(self, name: str) -> str:
+        """Verilen isimle karşılama.
+        
+        Args:
+            name: Karşılanacak kişinin adı
+            
+        Returns:
+            Kişiselleştirilmiş karşılama
+        """
+        return f"Merhaba, {name}!"
+EOF
+
+# API belgelendirmesini oluştur
+mkdir -p docs/source/api
+sphinx-apidoc -o docs/source/api seninprojen -H "API Referans" -M -e --force
+
+# 14. Makefile güncelle
+cat > docs/Makefile << EOF
+# Minimal makefile for Sphinx documentation
+
+# You can set these variables from the command line, and also
+# from the environment for the first two.
+SPHINXOPTS    ?=
+SPHINXBUILD   ?= sphinx-build
+SOURCEDIR     = source
+BUILDDIR      = build
+
+# Dil seçenekleri için
+LANG        ?= tr
+SOURCEDIR   ?= source
+BUILDDIR    ?= build
+
+# Put it first so that "make" without argument is like "make help".
+help:
+	@\$(SPHINXBUILD) -M help "\$(SOURCEDIR)" "\$(BUILDDIR)" \$(SPHINXOPTS) \$(O)
+
+.PHONY: help Makefile livehtml clean
+
+# Live dokumentasyon sunucusu
+livehtml:
+	sphinx-autobuild "\$(SOURCEDIR)" "\$(BUILDDIR)/html" \$(SPHINXOPTS) \$(O) --open-browser --port 8000
+
+# Temizleme
+clean:
+	rm -rf \$(BUILDDIR)/*
+
+# Catch-all target: route all unknown targets to Sphinx using the new
+# "make mode" option. \$(O) is meant as a shortcut for \$(SPHINXOPTS).
+%: Makefile
+	@\$(SPHINXBUILD) -M \$@ "\$(SOURCEDIR)" "\$(BUILDDIR)" \$(SPHINXOPTS) \$(O)
+EOF
+
+# 15. ReadTheDocs yapılandırması
+cat > .readthedocs.yaml << EOF
+version: 2
+
+build:
+  os: ubuntu-22.04
+  tools:
+    python: "3.10"
+
+python:
+   install:
+   - requirements: requirements.txt
+   - method: pip
+     path: .
+
+sphinx:
+  configuration: docs/source/conf.py
+  fail_on_warning: true
+
+formats:
+  - pdf
+  - epub
+EOF
+
+# 16. Sample test
+mkdir -p tests
+
+cat > tests/test_client.py << EOF
+"""İstemci test modülü."""
+
+import pytest
+from seninprojen.core.client import Client
+
+
+def test_hello_world():
+    """Hello world işlevi testi."""
+    client = Client()
+    assert client.hello_world() == "Hello, World!"
+
+
+def test_greet():
+    """Selamlama işlevi testi."""
+    client = Client()
+    assert client.greet("Test") == "Merhaba, Test!"
+
+
+def test_process_data():
+    """Veri işleme testi."""
+    client = Client()
+    result = client.process_data({"input": "test"})
+    assert "result" in result
+    assert "Processed" in result["result"]
+
+
+def test_invalid_data():
+    """Geçersiz veri hatası testi."""
+    client = Client()
+    with pytest.raises(ValueError):
+        client.process_data("not a dict")
+EOF
+
+# 17. Başlat!
+echo "Canlı dokümantasyon sunucusunu başlatmak için:"
+echo "cd docs && make livehtml"
+echo ""
+echo "Sadece HTML oluşturmak için:"
+echo "cd docs && make html"
+echo ""
+echo "Kurulum tamamlandı!"
+
+Sphinx dokümantasyon sisteminiz için kapsamlı bir kurulum ve yapılandırma dosyası oluşturdum. Bu kurulum, GitHub Copilot ile uyumlu çalışacak şekilde hazırlanmış olup, birçok gelişmiş özellik içerir:
+
+### Geliştirilen Özellikler:
+
+1. **Genişletilmiş Bağımlılıklar**: Orijinal listeden daha fazla kullanışlı Sphinx eklentisi ekledim:
+   - sphinx-prompt: Komut istemi örnekleri
+   - sphinx-tabs: Sekmeli içerik
+   - sphinx-togglebutton: Gizlenebilir bölümler
+   - sphinx-autodoc-typehints: Type hint desteği
+   - nbsphinx: Jupyter notebook entegrasyonu
+
+2. **Kapsamlı Proje Yapısı**:
+   - API dokümantasyonu, Geliştirici Notları, Örnekler gibi ayrı bölümler
+   - İyi organize edilmiş toctree yapısı
+
+3. **Gelişmiş conf.py**:
+   - Daha fazla eklenti konfigürasyonu
+   - Tema özelleştirmeleri
+   - intersphinx desteği (Python, NumPy gibi dış dokümanlara bağlantı)
+   - TypeHint belgelendirme desteği
+
+4. **Daha Ayrıntılı Geliştirici Notları**:
+   - Mimari tasarım diyagramları
+   - Ortam değişkenleri tablosu
+   - GitHub Copilot ipuçları
+
+5. **Daha İyi VS Code Entegrasyonu**:
+   - Black, isort gibi kod formatlayıcı ayarları
+   - Test yapılandırması
+   - Editör optimizasyonları
+
+6. **GitHub Copilot Yapılandırması**:
+   - Özel snippet şablonları
+   - Dosya tipi bazında etkinleştirme
+
+7. **CI/CD ve Geliştirme Araçları**:
+   - pre-commit konfigürasyonu
+   - ReadTheDocs yapılandırması
+   - Gelişmiş Makefile
+
+8. **Örnek Kod**:
+   - Temel istemci yapısı
+   - Type hinting ve docstring örnekleri
+   - Basit test örneği
+
+### Kullanım:
+
+1. Dosyayı çalıştırılabilir yapın: `chmod +x setup_script.sh`
+2. Betiği çalıştırın: `./setup_script.sh`
+3. Dokümantasyon sunucusunu başlatın: `cd docs && make livehtml`
+
+Bu kurulum, type hinting, detaylı docstring'ler ve mimari açıklamalarla GitHub Copilot'un daha akıllı öneriler sunmasına yardımcı olacak şekilde tasarlanmıştır. Ayrıca Markdown ve RST formatları arasında geçiş yapabilirsiniz.
+
+Daha fazla özelleştirme yapmak ister misiniz?
